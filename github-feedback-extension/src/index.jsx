@@ -31,6 +31,7 @@ const App = () => {
     let [feedback, setFeedback] = useState("");
     let [saving, setSaving] = useState(false);
     let [errors, setErrors] = useState(null);
+    let [errorMessage, setErrorMessage] = useState(null);
     let [showSuccess, setShowSuccess] = useState(false);
 
     const onTagClicked = (tag) => {
@@ -58,6 +59,7 @@ const App = () => {
     const submitForm = () => {
         let formValid = FeedbackValidator.validate(feedback, moods, tags);
         setErrors(null);
+        setErrorMessage(null);
 
         if (formValid.valid) {
             setSaving(true);
@@ -73,15 +75,22 @@ const App = () => {
                     setShowSuccess(true);
 
                     setTimeout(() => setShowSuccess(false), 1000);
+                }).catch(e => {
+                    setSaving(false);
+                    setErrorMessage('Network error, please try again.');
+                    setTimeout(() => setErrorMessage(false), 1000);
                 });
         } else {
             setErrors(formValid);
+            setErrorMessage('Please complete all fields.');
+            setTimeout(() => setErrorMessage(false), 1000);
         }
     };
 
     return (
         <Card>
             <Toast content="Your feedback has been submitted successfully." show={showSuccess} />
+            <Toast content={errorMessage} show={errorMessage} />
             <CardHeader dismissible>
             Let's Reflect.
             </CardHeader>
